@@ -94,6 +94,11 @@ prompts/    提示词模板
 
 如果这里提示缺少 `wewe-rss`、`md2wechat`、订阅源或配置文件，先补齐，再继续。
 
+如果你还没有部署外部依赖，可以先看它们的官方仓库：
+
+- `md2wechat`: [https://github.com/geekjourneyx/md2wechat-skill](https://github.com/geekjourneyx/md2wechat-skill)
+- `wewe-rss`: [https://github.com/cooderl/wewe-rss](https://github.com/cooderl/wewe-rss)
+
 2. 初始化本地项目
 
 ```bash
@@ -171,6 +176,13 @@ prompts/    提示词模板
 - `max_extra_numbers`：允许新增数字 token 的阈值，建议设为 `0`
 - `enforce_number_frequency`：校验同一数字是否被写少，防止把重复强调的关键数字写丢
 - `require_exact_number_frequency`：如需连“重复提到一次”也严格一致，可开启；默认关闭
+
+这里要注意：
+
+- 当前没有“原文字数超过多少就直接失败”的硬阈值
+- 长度门禁看的是改写后和原文的比例，默认要求落在 `0.6 ~ 2.0`
+- 更常见的失败原因其实是数字一致性门禁
+- 如果原文里数字很多、日期很多、分点很多，这篇文章就更容易在改写阶段被拦下
 
 改写强约束可在 `rewrite` 段调节：
 - `rewrite.required`：开启改写后是否必须成功；默认 `true`

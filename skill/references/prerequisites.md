@@ -25,6 +25,11 @@
 - 先问用户是要“连接已有部署”，还是“从官方仓库重新部署”
 - 不要静默 clone 和覆盖已有安装
 
+官方仓库：
+
+- `md2wechat`: [https://github.com/geekjourneyx/md2wechat-skill](https://github.com/geekjourneyx/md2wechat-skill)
+- `wewe-rss`: [https://github.com/cooderl/wewe-rss](https://github.com/cooderl/wewe-rss)
+
 ## 对这套 Skill 来说，什么叫“可用”
 
 ### `wewe-rss` 可用
