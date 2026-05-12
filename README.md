@@ -8,6 +8,13 @@
 - 生成封面图
 - 通过 `md2wechat` 上传到微信公众号草稿箱
 
+如果你是第一次把它交给另一个 Agent 用，先看这两处：
+
+- `skill/SKILL.md`
+- `skill/scripts/run_pipeline.sh`
+
+它们分别是 Skill 入口和命令入口。
+
 如果你是第一次使用，优先看：
 
 - [skill/references/prerequisites.md](skill/references/prerequisites.md)
@@ -37,6 +44,18 @@
 6. 运行 `candidates`
 7. 选好题后再运行 `run --dry-run`
 8. 确认无误后真实上传
+
+## 适合谁
+
+- 已经有自己的 `wewe-rss`
+- 已经有自己的 `md2wechat`
+- 想把候选、改写、配图、草稿上传串成稳定流程
+
+## 不适合谁
+
+- 想零配置直接开跑
+- 还没准备自己的订阅源
+- 希望仓库静默替你安装外部依赖
 
 ## 当前能力
 

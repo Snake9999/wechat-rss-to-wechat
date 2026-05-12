@@ -47,7 +47,9 @@ description: 安装、初始化、诊断并运行一套基于 wewe-rss 与 md2we
 - 诊断：`skill/scripts/run_pipeline.sh doctor`
 - 同步源：`skill/scripts/run_pipeline.sh sync`
 - 生成候选：`skill/scripts/run_pipeline.sh candidates`
-- 执行选定文章：`skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover`
+- 先验证链路：`skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --auto-cover --dry-run`
+- 再验证改写：`skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run`
+- 真实上传：`skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover`
 
 ## 推荐对话方式
 
