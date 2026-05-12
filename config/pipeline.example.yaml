@@ -1,0 +1,111 @@
+pipeline:
+  # How many recent feed items to inspect per source for candidate selection.
+  fetch_limit: 5
+  force_update: false
+  skip_if_processed: true
+  save_intermediate_files: true
+  # Optional: override feed URLs by template
+  # Placeholders:
+  # - {base_url}
+  # - {source_id}
+  # - {source_id_escaped}
+  # - {limit}
+  # - {query}
+  # feed_url_templates:
+  #   - "{base_url}/feeds/{source_id}.json?{query}"
+  #   - "{base_url}/feeds/{source_id}?{query}"
+
+publish:
+  upload_draft: true
+  require_cover_for_draft: true
+  with_cover: false
+
+rewrite:
+  enabled: false
+  required: true
+  style: wechat-structured
+  max_attempts: 3
+  retry_delay_seconds: 2
+  retry_on_quality_fail: true
+  humanize:
+    enabled: false
+    intensity: medium
+
+model:
+  default: gpt-5.4
+  provider: custom
+  # Leave empty to prefer LLM_BASE_URL from .env.
+  base_url: ""
+  api_key: ""
+
+quality:
+  min_length_ratio: 0.6
+  max_length_ratio: 2.0
+  require_numbers_consistency: true
+  max_missing_numbers: 0
+  forbid_new_numbers: true
+  max_extra_numbers: 0
+  enforce_number_frequency: false
+  require_exact_number_frequency: false
+
+image:
+  enabled: false
+  model: gpt-image-2
+  fallback_models:
+    - gpt-image-1
+  fallback_to_source_cover: true
+  size: 1536x1024
+  # Optional override; if empty, falls back to IMAGE_* env vars, then model.*, then LLM_* env vars
+  base_url: ""
+  api_key: ""
+  wechat_cover:
+    profile: default
+    style: ""
+    accent: ""
+    variant: wechat-21x9
+    render_sizes:
+      wechat-21x9: 1536x1024
+      wechat-share-1x1: 1024x1024
+    output_sizes:
+      wechat-21x9: 1536x658
+      wechat-share-1x1: 1024x1024
+    profiles:
+      default:
+        style: swiss
+        accent: ikb
+        variant: wechat-21x9
+      news-tech:
+        style: swiss
+        accent: ikb
+        variant: wechat-21x9
+      news-alert:
+        style: swiss
+        accent: safety-orange
+        variant: wechat-21x9
+      editorial-share:
+        style: editorial
+        accent: none
+        variant: wechat-share-1x1
+
+content:
+  # Recommended false to reduce copyright/repost risk and avoid broken remote images.
+  keep_original_images: false
+  strip_footer: true
+  footer_cut_markers:
+    - 推荐阅读
+    - 欢迎订阅
+    - 关注
+    - 阅读原文
+    - END
+    - 作者
+    - 来源
+    - 责编
+    - 声明
+  # Leave empty for now; fill your unified signature later.
+  unified_footer: ""
+
+freshness:
+  # Auto-select candidate across all enabled sources when --source is omitted.
+  max_age_hours: 48
+  # latest | source_order
+  pick_mode: latest

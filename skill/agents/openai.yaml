@@ -1,0 +1,4 @@
+interface:
+  display_name: "WeChat RSS to WeChat"
+  short_description: "Sync sources, pick candidates, rewrite, generate covers, and publish drafts"
+  default_prompt: "Use this skill to set up, diagnose, and run the WeChat content workflow from wewe-rss discovery through md2wechat draft upload."
