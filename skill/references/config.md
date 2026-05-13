@@ -17,7 +17,7 @@
 
 - `.env` 里的 API Key / Secret
 - `WEWE_RSS_BASE_URL`
-- `MD2WECHAT_RUN_SH`
+- `MD2WECHAT_RUN_SCRIPT`
 - `config/sources.yaml` 里的订阅源选择
 - 默认使用哪个 `cover_profile` / `rewrite_profile`
 
@@ -28,7 +28,8 @@
 ## `.env`
 
 - `WEWE_RSS_BASE_URL`: `wewe-rss` 服务地址，可用 `http://localhost:4000` 或 `http://<LAN_IP>:4000`
-- `MD2WECHAT_RUN_SH`: `md2wechat` 的 `run.sh` 路径
+- `MD2WECHAT_RUN_SCRIPT`: `md2wechat` 的运行脚本路径，支持 `run.sh`、`run.cmd`、`run.ps1`
+- `MD2WECHAT_RUN_SH`: 兼容旧变量名，仍可继续使用
 - `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL`: 改写阶段使用
 - `IMAGE_API_KEY` / `IMAGE_BASE_URL` / `IMAGE_MODEL`: 封面图阶段使用
 - `TZ`: 时区，默认 `Asia/Shanghai`
@@ -43,6 +44,8 @@
 bash /path/to/md2wechat/scripts/run.sh config init
 ```
 
+如果你在 Windows 原生环境下使用，也可以把 `MD2WECHAT_RUN_SCRIPT` 指向 `run.cmd` 或 `run.ps1`。
+
 然后在 `md2wechat` 自己的配置里完成公众号发布配置。
 
 注意：
@@ -56,7 +59,7 @@ bash /path/to/md2wechat/scripts/run.sh config init
 
 ```env
 WEWE_RSS_BASE_URL=http://localhost:4000
-MD2WECHAT_RUN_SH=/absolute/path/to/md2wechat/scripts/run.sh
+MD2WECHAT_RUN_SCRIPT=/absolute/path/to/md2wechat/scripts/run.sh
 LLM_API_KEY=your_key_here
 LLM_BASE_URL=https://your-llm-provider.example.com/v1
 LLM_MODEL=gpt-5.4
@@ -71,7 +74,7 @@ TZ=Asia/Shanghai
 第一次填完后，建议立刻运行：
 
 ```bash
-./skill/scripts/run_pipeline.sh prepare
+python skill/scripts/run_pipeline.py prepare
 ```
 
 它会告诉你当前卡在 `wewe-rss`、`md2wechat`、订阅源，还是本地配置文件。

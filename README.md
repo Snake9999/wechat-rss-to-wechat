@@ -11,7 +11,7 @@
 如果你是第一次把它交给另一个 Agent 用，先看这两处：
 
 - `skill/SKILL.md`
-- `skill/scripts/run_pipeline.sh`
+- `skill/scripts/run_pipeline.py`
 
 它们分别是 Skill 入口和命令入口。
 
@@ -31,6 +31,53 @@
   需要随仓库一起对外提供的第三方 Skill 或素材
 - `output/`
   运行时产物目录，只保留 `.gitkeep`
+
+## 系统支持
+
+- `macOS`：已验证可用
+- `Linux`：按当前依赖设计可用
+- `Windows`：优先使用 `python skill/scripts/run_pipeline.py ...` 或 `skill\\scripts\\run_pipeline.cmd ...`
+- `Windows + WSL`：当你的 `md2wechat` 仍只提供 `run.sh` 时，这是最稳妥的方案
+
+这套仓库现在的主入口已经是 Python，不再要求所有用户都从 `.sh` 启动。
+
+## Windows 首次使用指南
+
+如果你是第一次在 Windows 上跑这套流程，建议按这个顺序来：
+
+1. 先确认你的机器上能用 `Python 3.10+`
+2. 部署好你自己的 `wewe-rss`
+3. 部署好你自己的 `md2wechat`
+4. 判断你的 `md2wechat` 提供的是哪种启动脚本：
+   - 如果有 `run.cmd` 或 `run.ps1`，可以直接走 Windows 原生
+   - 如果只有 `run.sh`，建议改用 `WSL` 跑这套流程
+5. 把仓库拉到本地后，先运行：
+
+```powershell
+python skill/scripts/run_pipeline.py prepare
+```
+
+6. 按 `prepare` 的提示补齐 `.env`、`MD2WECHAT_RUN_SCRIPT`、`WEWE_RSS_BASE_URL`
+7. 再运行：
+
+```powershell
+python skill/scripts/run_pipeline.py bootstrap
+python skill/scripts/run_pipeline.py sync
+python skill/scripts/run_pipeline.py candidates
+```
+
+8. 选好题后，先跑不带改写的 dry-run：
+
+```powershell
+python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --item-id <ITEM_ID> --auto-cover --dry-run
+```
+
+9. 传输链确认没问题后，再继续跑改写版 dry-run 和真实上传
+
+Windows 用户最需要先确认的不是正文提取，而是这两件事：
+
+- `MD2WECHAT_RUN_SCRIPT` 到底应该指向 `run.cmd`、`run.ps1`，还是你其实应该走 `WSL`
+- `WEWE_RSS_BASE_URL` 指向的是 `localhost`，还是你那台跑 `wewe-rss` 的机器局域网地址
 
 ## 公开使用路径
 
@@ -89,7 +136,7 @@ prompts/    提示词模板
 1. 先检查前置条件
 
 ```bash
-./skill/scripts/run_pipeline.sh prepare
+python skill/scripts/run_pipeline.py prepare
 ```
 
 如果这里提示缺少 `wewe-rss`、`md2wechat`、订阅源或配置文件，先补齐，再继续。
@@ -102,7 +149,7 @@ prompts/    提示词模板
 2. 初始化本地项目
 
 ```bash
-./skill/scripts/run_pipeline.sh bootstrap
+python skill/scripts/run_pipeline.py bootstrap
 ```
 
 `bootstrap` 会自动补齐缺失的本地配置模板、安装 Python 依赖，并跑一次基础诊断。
@@ -115,13 +162,13 @@ prompts/    提示词模板
 3. 如果你已经在 `wewe-rss` 里订阅了很多公众号，不想手填 `sources.yaml`，可以先自动同步一次：
 
 ```bash
-./skill/scripts/run_pipeline.sh sync
+python skill/scripts/run_pipeline.py sync
 ```
 
 4. 先生成今日候选池
 
 ```bash
-./skill/scripts/run_pipeline.sh candidates
+python skill/scripts/run_pipeline.py candidates
 ```
 
 候选报告会同时保存到：
@@ -134,19 +181,19 @@ prompts/    提示词模板
 5. 选中一篇后，先跑不带改写的 dry-run 传输测试：
 
 ```bash
-./skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --auto-cover --dry-run
+python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --item-id <ITEM_ID> --auto-cover --dry-run
 ```
 
 如果这一步能过，再继续验证改写链：
 
 ```bash
-./skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run
+python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run
 ```
 
 6. 确认无误后，真实上传：
 
 ```bash
-./skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover
+python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover
 ```
 
 如果改写链因为质量门禁失败，不代表提取、配图和上传链本身坏了。此时先保留不带改写的 dry-run 结果，再决定是否调整 `quality.*` 或换一篇更适合改写的文章。
@@ -242,6 +289,7 @@ prompts/    提示词模板
 ```bash
 python -m app.main doctor
 python -m app.main prepare
+python -m app.main bootstrap
 python -m app.main sync-sources
 python -m app.main daily-candidates
 python -m app.main daily-candidates --include-processed

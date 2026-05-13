@@ -41,6 +41,18 @@ class DiagnoseWeweRssConnectivityTests(unittest.TestCase):
 
         self.assertEqual(resolved, str(candidate))
 
+    def test_resolve_md2wechat_run_sh_accepts_windows_script_candidates(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            home = Path(tmp_dir)
+            candidate = home / ".codex" / "skills" / "md2wechat" / "scripts" / "run.cmd"
+            candidate.parent.mkdir(parents=True, exist_ok=True)
+            candidate.write_text("@echo off\r\n", encoding="utf-8")
+
+            with patch("pathlib.Path.home", return_value=home):
+                resolved = resolve_md2wechat_run_sh("")
+
+        self.assertEqual(resolved, str(candidate))
+
 
 if __name__ == "__main__":
     unittest.main()

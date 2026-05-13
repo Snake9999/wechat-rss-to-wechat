@@ -23,7 +23,9 @@ class AppSettings:
 def load_settings() -> AppSettings:
     root_dir = Path(__file__).resolve().parent.parent
     load_dotenv(root_dir / ".env")
-    md2wechat_run_sh = resolve_md2wechat_run_sh(os.getenv("MD2WECHAT_RUN_SH", ""))
+    md2wechat_run_sh = resolve_md2wechat_run_sh(
+        os.getenv("MD2WECHAT_RUN_SCRIPT", os.getenv("MD2WECHAT_RUN_SH", "")),
+    )
     return AppSettings(
         root_dir=root_dir,
         wewe_rss_base_url=os.getenv("WEWE_RSS_BASE_URL", "http://localhost:4000").rstrip("/"),
@@ -45,14 +47,19 @@ def load_yaml(path: Path) -> dict:
 
 def resolve_md2wechat_run_sh(raw_value: str) -> str:
     value = raw_value.strip()
-    if value and not value.startswith("/absolute/path/to/"):
+    if value and "/absolute/path/to/" not in value.replace("\\", "/"):
         return value
 
-    candidates = [
-        str(Path.home() / ".cc-switch" / "skills" / "md2wechat" / "scripts" / "run.sh"),
-        str(Path.home() / ".claude" / "skills" / "md2wechat" / "scripts" / "run.sh"),
-        str(Path.home() / ".codex" / "skills" / "md2wechat" / "scripts" / "run.sh"),
+    candidates: list[str] = []
+    script_names = ["run.sh", "run.cmd", "run.ps1"]
+    roots = [
+        Path.home() / ".cc-switch" / "skills" / "md2wechat" / "scripts",
+        Path.home() / ".claude" / "skills" / "md2wechat" / "scripts",
+        Path.home() / ".codex" / "skills" / "md2wechat" / "scripts",
     ]
+    for root in roots:
+        for script_name in script_names:
+            candidates.append(str(root / script_name))
     for candidate in candidates:
         if Path(candidate).exists():
             return candidate

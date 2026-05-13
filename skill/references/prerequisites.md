@@ -12,7 +12,7 @@
 ## 你需要自己准备什么
 
 - `WEWE_RSS_BASE_URL`
-- `MD2WECHAT_RUN_SH`
+- `MD2WECHAT_RUN_SCRIPT`，或兼容旧名 `MD2WECHAT_RUN_SH`
 - `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL`
 - `IMAGE_API_KEY` / `IMAGE_BASE_URL` / `IMAGE_MODEL`
 - `md2wechat` 自己的发布配置（公众号 AppID / Secret）
@@ -40,13 +40,14 @@
 
 ### `md2wechat` 可用
 
-- `MD2WECHAT_RUN_SH` 指向有效的 `run.sh`
+- `MD2WECHAT_RUN_SCRIPT` 指向有效的 `run.sh`、`run.cmd` 或 `run.ps1`
 - `md2wechat` 可以读取公众号发布所需的配置
 - `run --dry-run` 能完成转换链路
 
 推荐做法：
 
 - 先执行 `bash /path/to/md2wechat/scripts/run.sh config init`
+- 如果你在 Windows 原生环境下使用，也可以把 `MD2WECHAT_RUN_SCRIPT` 指向 `run.cmd` 或 `run.ps1`
 - 在 `md2wechat` 自己的配置里完成公众号发布配置
 
 ## 一句话判断
@@ -58,7 +59,7 @@
 第一次进入仓库时，先运行：
 
 ```bash
-./skill/scripts/run_pipeline.sh prepare
+python skill/scripts/run_pipeline.py prepare
 ```
 
 这个命令只做检查与引导，不会静默替你安装外部依赖。

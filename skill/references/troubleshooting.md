@@ -81,7 +81,7 @@
 - 看 `run_history.jsonl` 里的 `cover.tried_models`
 - 必要时先关闭改写或改用原文封面回退路径
 
-### `MD2WECHAT_RUN_SH` 不可用
+### `MD2WECHAT_RUN_SCRIPT` 不可用
 
 常见原因：
 
@@ -90,14 +90,15 @@
 
 先做什么：
 
-- 检查 `.env` 里的 `MD2WECHAT_RUN_SH`
+- 检查 `.env` 里的 `MD2WECHAT_RUN_SCRIPT`
 - 手动执行一次：
   `bash /path/to/md2wechat/scripts/run.sh --help`
+- 如果你是 Windows 原生环境，也可以改成测试 `run.cmd` 或 `run.ps1`
 
 ## 先看哪里
 
-- 首次使用问题：先看 `./skill/scripts/run_pipeline.sh prepare`
-- 环境问题：先看 `./skill/scripts/run_pipeline.sh doctor`
+- 首次使用问题：先看 `python skill/scripts/run_pipeline.py prepare`
+- 环境问题：先看 `python skill/scripts/run_pipeline.py doctor`
 - 候选问题：先看 `output/candidates/latest.md` 和 `latest.json`
 - 改写问题：先看 `data/state/run_history.jsonl` 的 `rewrite` / `rewrite_quality`
 - 配图问题：先看 `run_history.jsonl` 的 `cover`

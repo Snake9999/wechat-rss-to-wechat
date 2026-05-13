@@ -35,21 +35,21 @@ description: 安装、初始化、诊断并运行一套基于 wewe-rss 与 md2we
 ## 默认动作
 
 1. 先确认 `references/prerequisites.md` 里的前置条件
-2. 先运行 `scripts/prepare.sh`
-3. 如果缺本地配置，再运行 `scripts/bootstrap.sh`
-4. 然后运行 `scripts/doctor.sh`
+2. 先运行 `python skill/scripts/run_pipeline.py prepare`
+3. 如果缺本地配置，再运行 `python skill/scripts/run_pipeline.py bootstrap`
+4. 然后运行 `python skill/scripts/run_pipeline.py doctor`
 5. 日常先看候选，再跑生产链
 
 ## 日常入口
 
-- 准备检查：`skill/scripts/run_pipeline.sh prepare`
-- 初始化：`skill/scripts/run_pipeline.sh bootstrap`
-- 诊断：`skill/scripts/run_pipeline.sh doctor`
-- 同步源：`skill/scripts/run_pipeline.sh sync`
-- 生成候选：`skill/scripts/run_pipeline.sh candidates`
-- 先验证链路：`skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --auto-cover --dry-run`
-- 再验证改写：`skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run`
-- 真实上传：`skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover`
+- 准备检查：`python skill/scripts/run_pipeline.py prepare`
+- 初始化：`python skill/scripts/run_pipeline.py bootstrap`
+- 诊断：`python skill/scripts/run_pipeline.py doctor`
+- 同步源：`python skill/scripts/run_pipeline.py sync`
+- 生成候选：`python skill/scripts/run_pipeline.py candidates`
+- 先验证链路：`python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --item-id <ITEM_ID> --auto-cover --dry-run`
+- 再验证改写：`python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run`
+- 真实上传：`python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover`
 
 ## 推荐对话方式
 

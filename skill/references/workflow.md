@@ -24,7 +24,7 @@
 ## 模式 A：生成今日候选
 
 - 输入：无，或可选 `--source`
-- 命令：`./skill/scripts/run_pipeline.sh candidates`
+- 命令：`python skill/scripts/run_pipeline.py candidates`
 - 输出：
   - `output/candidates/latest.json`
   - `output/candidates/latest.md`
@@ -36,8 +36,8 @@
 
 - 输入：`source_id + item_id`
 - 命令：
-  - `./skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run`
-  - `./skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover`
+  - `python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run`
+  - `python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover`
 - 输出：
   - `output/raw/*.html`
   - `output/markdown/*.md`
@@ -51,7 +51,7 @@
 ## 模式 C：直接处理单一来源的最新文章
 
 - 输入：`source_id`
-- 命令：`./skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --rewrite --auto-cover`
+- 命令：`python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --rewrite --auto-cover`
 - 适用场景：
   - 个人日常单源使用
   - 不需要先做候选池
@@ -76,4 +76,4 @@
 - 提取失败：先查微信页面结构是否变动
 - 改写不理想：先查 `rewrite` 风格和 `quality` 约束
 - 封面失败：先查 `IMAGE_*` / `image.*` 配置与 provider 可用性
-- 上传失败：先查 `MD2WECHAT_RUN_SH`、微信白名单和本地 `md2wechat` 版本
+- 上传失败：先查 `MD2WECHAT_RUN_SCRIPT`、微信白名单和本地 `md2wechat` 版本

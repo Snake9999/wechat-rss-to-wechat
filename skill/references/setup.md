@@ -21,6 +21,12 @@
 - 仓库承载真正的抓取、转换、改写和发布逻辑
 - 长期状态、个人密钥和复杂实现都留在仓库里
 
+## 系统建议
+
+- `macOS` / `Linux`：直接使用 `python skill/scripts/run_pipeline.py ...`
+- `Windows`：优先使用 `python skill/scripts/run_pipeline.py ...`，或 `skill\\scripts\\run_pipeline.cmd ...`
+- 如果你的 `md2wechat` 本地安装仍只提供 `run.sh`，Windows 更推荐走 `WSL`
+
 ## 首次运行建议
 
 首次优先验证四件事：
@@ -54,7 +60,7 @@
 - 改写：`LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL`
 - 配图：`IMAGE_API_KEY` / `IMAGE_BASE_URL` / `IMAGE_MODEL`
 - 发布：先在 `md2wechat` 自己的配置里完成公众号发布配置
-- 路径：`MD2WECHAT_RUN_SH`
+- 路径：`MD2WECHAT_RUN_SCRIPT`
 - 服务地址：`WEWE_RSS_BASE_URL`
 
 如果 `wewe-rss` 或 `md2wechat` 还没装好，先停在这里，不要直接往下跑。
@@ -71,12 +77,12 @@
 ## 推荐首次命令
 
 ```bash
-./skill/scripts/run_pipeline.sh prepare
-./skill/scripts/run_pipeline.sh bootstrap
-./skill/scripts/run_pipeline.sh sync
-./skill/scripts/run_pipeline.sh candidates
-./skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --auto-cover --dry-run
-./skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run
+python skill/scripts/run_pipeline.py prepare
+python skill/scripts/run_pipeline.py bootstrap
+python skill/scripts/run_pipeline.py sync
+python skill/scripts/run_pipeline.py candidates
+python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --item-id <ITEM_ID> --auto-cover --dry-run
+python skill/scripts/run_pipeline.py run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run
 ```
 
 ## 推荐验证顺序

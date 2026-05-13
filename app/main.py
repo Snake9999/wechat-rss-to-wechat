@@ -5,6 +5,9 @@ import json
 from datetime import datetime
 from datetime import timezone
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 import yaml
 
 from app.extract.wechat_article import extract_article
@@ -38,6 +41,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     prepare = subparsers.add_parser("prepare", help="Check prerequisites and suggest next steps")
     prepare.set_defaults(handler=handle_prepare)
+
+    bootstrap = subparsers.add_parser("bootstrap", help="Create local config files and install Python dependencies")
+    bootstrap.set_defaults(handler=handle_bootstrap)
 
     fetch = subparsers.add_parser("fetch-latest", help="Fetch latest article metadata")
     fetch.add_argument("--source", help="wewe-rss source id; omit to auto-select across enabled sources")
@@ -100,7 +106,7 @@ def handle_doctor(_: argparse.Namespace) -> int:
     )
 
     results.append(("WEWE_RSS_BASE_URL", wewe_rss_ok, wewe_rss_detail))
-    results.append(("MD2WECHAT_RUN_SH", md2wechat_ok, settings.md2wechat_run_sh or "(empty)"))
+    results.append(("MD2WECHAT_RUN_SCRIPT", md2wechat_ok, settings.md2wechat_run_sh or "(empty)"))
     results.append((".env", (settings.root_dir / ".env").exists(), str(settings.root_dir / ".env")))
     results.append(("config/sources.yaml", sources_exists, str(settings.sources_config_path)))
     results.append(("config/pipeline.yaml", pipeline_exists, str(settings.pipeline_config_path)))
@@ -133,15 +139,24 @@ def handle_prepare(_: argparse.Namespace) -> int:
     print("")
     if report["ready"]:
         print("[READY] prerequisites look good")
-        print("[NEXT] ./skill/scripts/run_pipeline.sh sync")
-        print("[NEXT] ./skill/scripts/run_pipeline.sh candidates")
-        print("[NEXT] ./skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run")
+        print(f"[NEXT] {pipeline_launcher_command('sync')}")
+        print(f"[NEXT] {pipeline_launcher_command('candidates')}")
+        print(f"[NEXT] {pipeline_launcher_command('run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run')}")
         return 0
 
     print("[BLOCKED] fix the items above before running the production chain")
     for step in report["next_steps"]:
         print(f"[NEXT] {step}")
     return 1
+
+
+def handle_bootstrap(_: argparse.Namespace) -> int:
+    settings = load_settings()
+    root_dir = settings.root_dir
+    print(f"[INFO] bootstrap project at {root_dir}")
+    copy_default_config_files(root_dir)
+    install_python_dependencies(root_dir)
+    return handle_doctor(argparse.Namespace())
 
 
 def handle_fetch_latest(args: argparse.Namespace) -> int:
@@ -637,6 +652,41 @@ def load_source_configs(settings) -> list[dict]:
     return merge_source_configs([], discovered_sources)
 
 
+def pipeline_launcher_command(args: str = "") -> str:
+    base = "python skill/scripts/run_pipeline.py"
+    return f"{base} {args}".strip()
+
+
+def copy_default_config_files(root_dir: Path) -> None:
+    pairs = [
+        (root_dir / ".env.example", root_dir / ".env"),
+        (root_dir / "config" / "sources.example.yaml", root_dir / "config" / "sources.yaml"),
+        (root_dir / "config" / "pipeline.example.yaml", root_dir / "config" / "pipeline.yaml"),
+    ]
+    for source, target in pairs:
+        if target.exists():
+            print(f"[SKIP] {target} already exists")
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+        print(f"[OK] created {target}")
+
+
+def install_python_dependencies(root_dir: Path) -> None:
+    venv_dir = root_dir / ".venv"
+    if sys.platform.startswith("win"):
+        venv_python = venv_dir / "Scripts" / "python.exe"
+    else:
+        venv_python = venv_dir / "bin" / "python"
+
+    if not venv_python.exists():
+        subprocess.run([sys.executable, "-m", "venv", str(venv_dir)], check=True, cwd=root_dir)
+
+    subprocess.run([str(venv_python), "-m", "pip", "install", "--upgrade", "pip"], check=True, cwd=root_dir)
+    subprocess.run([str(venv_python), "-m", "pip", "install", "-e", f"{root_dir}[dev]"], check=True, cwd=root_dir)
+    print(f"[OK] virtualenv ready at {venv_dir}")
+
+
 def build_prepare_report(settings, pipeline_config: dict) -> dict:
     env_exists = (settings.root_dir / ".env").exists()
     pipeline_exists = settings.pipeline_config_path.exists()
@@ -656,7 +706,7 @@ def build_prepare_report(settings, pipeline_config: dict) -> dict:
             wewe_rss_detail,
         ),
         (
-            "MD2WECHAT_RUN_SH",
+            "MD2WECHAT_RUN_SCRIPT",
             md2wechat_ok,
             settings.md2wechat_run_sh or "(empty)",
         ),
@@ -692,21 +742,24 @@ def build_prepare_report(settings, pipeline_config: dict) -> dict:
 
     next_steps: list[str] = []
     if not env_exists or not pipeline_exists:
-        next_steps.append("run ./skill/scripts/run_pipeline.sh bootstrap to create local config files and install Python dependencies")
+        next_steps.append(f"run {pipeline_launcher_command('bootstrap')} to create local config files and install Python dependencies")
     if not wewe_rss_ok:
         next_steps.append("check whether wewe-rss is running, then confirm WEWE_RSS_BASE_URL should use localhost or a LAN URL")
     if wewe_rss_ok and not source_catalog_ok:
         next_steps.append("open your wewe-rss admin and subscribe at least one WeChat source, then rerun sync")
     if not md2wechat_ok:
-        next_steps.append("install md2wechat or point MD2WECHAT_RUN_SH to its scripts/run.sh")
+        next_steps.append("install md2wechat or point MD2WECHAT_RUN_SCRIPT to its run script; MD2WECHAT_RUN_SH is still accepted as a legacy alias")
     if md2wechat_ok:
         next_steps.append("make sure md2wechat has finished its own publisher config init before real draft upload")
     if wewe_rss_ok and source_catalog_ok and not sources_exists:
-        next_steps.append("run ./skill/scripts/run_pipeline.sh sync to generate config/sources.yaml from your subscriptions")
+        next_steps.append(f"run {pipeline_launcher_command('sync')} to generate config/sources.yaml from your subscriptions")
     if wewe_rss_ok and source_catalog_ok and md2wechat_ok and env_exists and pipeline_exists:
-        next_steps.append("run ./skill/scripts/run_pipeline.sh sync")
-        next_steps.append("run ./skill/scripts/run_pipeline.sh candidates")
-        next_steps.append("after you pick an item, run ./skill/scripts/run_pipeline.sh run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run")
+        next_steps.append(f"run {pipeline_launcher_command('sync')}")
+        next_steps.append(f"run {pipeline_launcher_command('candidates')}")
+        next_steps.append(
+            "after you pick an item, run "
+            f"{pipeline_launcher_command('run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run')}"
+        )
 
     ready = all([env_exists, pipeline_exists, wewe_rss_ok, source_catalog_ok, md2wechat_ok])
     return {

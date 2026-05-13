@@ -5,7 +5,12 @@ from pathlib import Path
 from unittest.mock import patch
 import unittest
 
-from app.publish.md2wechat_adapter import extract_markdown_title, extract_media_id, upload_markdown
+from app.publish.md2wechat_adapter import (
+    build_md2wechat_command,
+    extract_markdown_title,
+    extract_media_id,
+    upload_markdown,
+)
 
 
 class Md2WechatAdapterTests(unittest.TestCase):
@@ -23,6 +28,26 @@ class Md2WechatAdapterTests(unittest.TestCase):
             "success": True,
         }
         self.assertEqual(extract_media_id(json.dumps(payload, ensure_ascii=False)), "MEDIA_ID_123")
+
+    def test_build_md2wechat_command_supports_windows_cmd(self):
+        command = build_md2wechat_command(r"C:\tools\md2wechat\run.cmd", "convert", "article.md")
+        self.assertEqual(command, ["cmd", "/c", r"C:\tools\md2wechat\run.cmd", "convert", "article.md"])
+
+    def test_build_md2wechat_command_supports_powershell(self):
+        command = build_md2wechat_command(r"C:\tools\md2wechat\run.ps1", "convert", "article.md")
+        self.assertEqual(
+            command,
+            [
+                "powershell",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                r"C:\tools\md2wechat\run.ps1",
+                "convert",
+                "article.md",
+            ],
+        )
 
     def test_upload_markdown_overrides_draft_title_before_create(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
