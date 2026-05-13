@@ -41,6 +41,46 @@
 
 这套仓库现在的主入口已经是 Python，不再要求所有用户都从 `.sh` 启动。
 
+## 让你的 Agent 自动识别这个 Skill
+
+如果你只是把仓库 clone 到本地，`skill/SKILL.md` 不一定会自动出现在 Agent 的可用技能列表里。
+
+原因不是仓库坏了，而是大多数 Agent 只会扫描它们自己的技能目录。不同工具的目录不一样，所以这里不要把某一个产品的路径当成通用规则。
+
+你真正需要做的事情只有一件：
+
+- 把当前仓库里的 `skill/` 目录，链接或复制到你所使用的 Agent 的技能目录里
+
+通用安装命令：
+
+```bash
+python skill/scripts/install_skill_link.py --target-dir /path/to/your/agent/skills
+```
+
+例如，某些工具常见的技能目录可能像这样：
+
+- `~/.codex/skills/`
+- `~/.claude/skills/`
+- `~/.agents/skills/`
+- 你自己为其他 Agent 指定的 skills 目录
+
+如果你明确知道自己的 Agent 技能目录，可以直接这样装：
+
+```bash
+python skill/scripts/install_skill_link.py --target-dir ~/.codex/skills
+python skill/scripts/install_skill_link.py --target-dir ~/.claude/skills
+```
+
+安装完成后，重新开一个新的 Agent 会话，让它刷新技能列表。
+
+如果你的 Agent 根本没有“技能目录”这一套机制，那就不要强行套这个模式，直接让它读取仓库内的：
+
+```text
+skill/SKILL.md
+```
+
+如果你只是在当前这一个仓库里临时跑一次，也可以不安装，直接让 Agent 先读 `skill/SKILL.md`，再按里面的 `prepare -> sync -> candidates -> run` 流程执行。
+
 ## Windows 首次使用指南
 
 如果你是第一次在 Windows 上跑这套流程，建议按这个顺序来：
@@ -140,6 +180,12 @@ python skill/scripts/run_pipeline.py prepare
 ```
 
 如果这里提示缺少 `wewe-rss`、`md2wechat`、订阅源或配置文件，先补齐，再继续。
+
+如果这里提示 `WEWE_RSS_BASE_URL` 不可达，而你确认 `wewe-rss` 明明已经在本机跑着，再多看一眼当前执行环境：
+
+- 在普通本机终端里，`http://localhost:4000` 往往没问题
+- 在某些 sandboxed agent 环境里，`localhost` 可能会被拦住
+- 这时不要急着怀疑 `wewe-rss` 挂了，先把 `.env` 里的 `WEWE_RSS_BASE_URL` 改成局域网地址再试
 
 如果你还没有部署外部依赖，可以先看它们的官方仓库：
 

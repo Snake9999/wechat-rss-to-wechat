@@ -1197,7 +1197,10 @@ def diagnose_wewe_rss_connectivity(base_url: str, pipeline_config: dict) -> tupl
 
     hint = "check that wewe-rss is running and that WEWE_RSS_BASE_URL points to a reachable address"
     if any(loopback in base_url for loopback in ("localhost", "127.0.0.1", "::1")):
-        hint += "; if another execution environment needs access, try a LAN URL like http://<LAN_IP>:4000"
+        hint += (
+            "; if you are running inside Codex or another sandboxed agent, loopback access may be blocked "
+            "even when the service is healthy; try a LAN URL like http://<LAN_IP>:4000"
+        )
 
     attempted = ", ".join(errors) if errors else "no probe URL attempted"
     return False, f"{base_url} (unreachable; {hint}. probes: {attempted})"

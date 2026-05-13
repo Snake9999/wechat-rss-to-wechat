@@ -27,6 +27,7 @@ class DiagnoseWeweRssConnectivityTests(unittest.TestCase):
 
         self.assertFalse(ok)
         self.assertIn("LAN URL", detail)
+        self.assertIn("sandboxed agent", detail)
         self.assertIn("unreachable", detail)
 
     def test_resolve_md2wechat_run_sh_uses_generic_home_paths(self):
