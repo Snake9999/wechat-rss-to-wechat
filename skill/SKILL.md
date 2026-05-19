@@ -38,7 +38,23 @@ description: 安装、初始化、诊断并运行一套基于 wewe-rss 与 md2we
 2. 先运行 `python skill/scripts/run_pipeline.py prepare`
 3. 如果缺本地配置，再运行 `python skill/scripts/run_pipeline.py bootstrap`
 4. 然后运行 `python skill/scripts/run_pipeline.py doctor`
-5. 日常先看候选，再跑生产链
+5. 日常固定走 `sync -> candidates -> 人工选题 -> run`
+
+## 唯一推荐主路径
+
+公开 Skill 默认只推荐这一条主路径：
+
+1. `prepare`
+2. `bootstrap`
+3. `doctor`
+4. `sync`
+5. `candidates`
+6. 人工从 `output/candidates/latest.md` 里选题
+7. `run --source <SOURCE_ID> --item-id <ITEM_ID> --dry-run`
+8. `run --source <SOURCE_ID> --item-id <ITEM_ID> --rewrite --auto-cover --dry-run`
+9. 确认无误后，再真实上传
+
+不要跳过候选池直接让 Skill 自动挑“某个源的最新文章”。
 
 ## 日常入口
 
@@ -69,3 +85,4 @@ description: 安装、初始化、诊断并运行一套基于 wewe-rss 与 md2we
 - 如果用户还没确定今天做哪篇，优先进入候选模式，不直接发布
 - 如果用户已经给了 `source_id + item_id`，直接进入生产链
 - 如果用户只想验证链路，优先建议先跑不带 `--rewrite` 的 `--dry-run`
+- 公共 Skill 包装入口默认要求显式提供 `source_id + item_id`，避免不同环境下自动挑到不一致的“最新文章”

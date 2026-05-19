@@ -73,6 +73,12 @@ python skill/scripts/install_skill_link.py --target-dir ~/.claude/skills
 
 安装完成后，重新开一个新的 Agent 会话，让它刷新技能列表。
 
+注意：
+
+- `install_skill_link.py` 是通用安装入口
+- `skill/scripts/install_codex_skill.py` 只是 Codex 便捷脚本，不是这套公共 Skill 的唯一安装方式
+- 公共 Skill 的核心是 `skill/` 目录本身，不是某一个 Agent 的私有目录结构
+
 如果你的 Agent 根本没有“技能目录”这一套机制，那就不要强行套这个模式，直接让它读取仓库内的：
 
 ```text
@@ -131,6 +137,10 @@ Windows 用户最需要先确认的不是正文提取，而是这两件事：
 6. 运行 `candidates`
 7. 选好题后再运行 `run --dry-run`
 8. 确认无误后真实上传
+
+这里推荐把“候选 -> 人工选题 -> 显式指定 `source_id + item_id` 再 run”当成唯一主路径。
+
+不推荐把“直接处理某个源当前最新文章”当成公共 Skill 的默认行为，因为这会让不同用户、不同机器、不同时间点的结果不够稳定。
 
 ## 适合谁
 
