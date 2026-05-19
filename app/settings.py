@@ -50,6 +50,8 @@ def resolve_md2wechat_run_sh(raw_value: str) -> str:
     if value and "/absolute/path/to/" not in value.replace("\\", "/"):
         return value
 
+    # Best-effort fallback for common local agent layouts.
+    # Public users should still prefer an explicit MD2WECHAT_RUN_SCRIPT.
     candidates: list[str] = []
     script_names = ["run.sh", "run.cmd", "run.ps1"]
     roots = [

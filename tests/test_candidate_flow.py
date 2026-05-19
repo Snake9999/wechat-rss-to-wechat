@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -24,6 +25,12 @@ class FakeProcessedStore:
 
 
 class CandidateFlowTests(unittest.TestCase):
+    def iso_hours_ago(self, hours: int) -> str:
+        return (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
+
+    def iso_days_ago(self, days: int) -> str:
+        return (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+
     def make_settings(self):
         tmp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(tmp_dir.cleanup)
@@ -46,7 +53,7 @@ class CandidateFlowTests(unittest.TestCase):
                 item_id="item-1",
                 title="第一篇",
                 url="https://example.com/1",
-                published_at="2026-05-12T08:00:00+00:00",
+                published_at=self.iso_hours_ago(1),
             ),
             ArticleMetadata(
                 source_id="source-a",
@@ -54,7 +61,7 @@ class CandidateFlowTests(unittest.TestCase):
                 item_id="item-2",
                 title="第二篇",
                 url="https://example.com/2",
-                published_at="2026-05-12T07:00:00+00:00",
+                published_at=self.iso_hours_ago(2),
             ),
         ]
 
@@ -89,7 +96,7 @@ class CandidateFlowTests(unittest.TestCase):
                         item_id="a-1",
                         title="源A 最新",
                         url="https://example.com/a1",
-                        published_at="2026-05-12T08:00:00+00:00",
+                        published_at=self.iso_hours_ago(2),
                     ),
                 ],
                 "source-b": [
@@ -99,7 +106,7 @@ class CandidateFlowTests(unittest.TestCase):
                         item_id="b-1",
                         title="源B 更新",
                         url="https://example.com/b1",
-                        published_at="2026-05-12T09:00:00+00:00",
+                        published_at=self.iso_hours_ago(1),
                     ),
                     ArticleMetadata(
                         source_id="source-b",
@@ -107,7 +114,7 @@ class CandidateFlowTests(unittest.TestCase):
                         item_id="b-old",
                         title="源B 旧文",
                         url="https://example.com/b-old",
-                        published_at="2026-05-01T09:00:00+00:00",
+                        published_at=self.iso_days_ago(10),
                     ),
                 ],
             }
@@ -147,7 +154,7 @@ class CandidateFlowTests(unittest.TestCase):
                 item_id="item-1",
                 title="第一篇",
                 url="https://example.com/1",
-                published_at="2026-05-12T08:00:00+00:00",
+                published_at=self.iso_hours_ago(1),
             ),
             ArticleMetadata(
                 source_id="source-a",
@@ -155,7 +162,7 @@ class CandidateFlowTests(unittest.TestCase):
                 item_id="item-2",
                 title="第二篇",
                 url="https://example.com/2",
-                published_at="2026-05-12T07:00:00+00:00",
+                published_at=self.iso_hours_ago(2),
             ),
         ]
 
@@ -239,7 +246,7 @@ class CandidateFlowTests(unittest.TestCase):
             item_id="a-1",
             title="源A 最新",
             url="https://example.com/a1",
-            published_at="2026-05-12T08:00:00+00:00",
+            published_at=self.iso_hours_ago(1),
         )
 
         with patch("app.main.get_pipeline_source_ids", return_value=["source-a"]), patch(
